@@ -1,11 +1,13 @@
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 
 function Hero() {
     return (
         <div className='w-full relative h-screen overflow-hidden'>
             <Image src={'/hero.gif'} alt='' width={1000} height={1000}
+                priority
                 className='w-full h-full object-cover absolute inset-0'
             />
 
@@ -23,7 +25,9 @@ function Hero() {
                 <h2 className='mt-5 font-game text-3xl'>
                     Beginner friendly coding courses and projects.
                 </h2>
-                <Button className='font-game text-3xl p-6 mt-7' variant={'pixel'}>Get Started</Button>
+                <Link href={'/sign-in'}>
+                    <Button className='font-game text-3xl p-6 mt-7 cursor-pointer' variant={'pixel'}>Get Started</Button>
+                </Link>
 
             </div>
 
