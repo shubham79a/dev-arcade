@@ -12,7 +12,7 @@ function UpgradeToPro() {
                 Join Pro Membership and get All course access
             </p>
             <Link href={'/pricing'}>
-                <Button className='font-game w-full' variant={'pixel'} size={'lg'} >
+                <Button className='font-game w-full text-2xl ' variant={'pixel'} size={'lg'} >
                     Upgrade
                 </Button>
             </Link>
