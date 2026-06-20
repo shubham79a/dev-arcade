@@ -127,7 +127,6 @@ function Header() {
             </NavigationMenu>
 
             {/* signup */}
-
             {
                 !user ?
                     <Link href={'/sign-in'}>
