@@ -21,6 +21,44 @@ type Props = {
 }
 
 function CourseChapters({ loading, courseDetail }: Props) {
+
+
+  const EnableExercise = (
+    chapterIndex: number,
+    exerciseIndex: number,
+    chapterExercisesLength: number
+  ) => {
+    const completed = courseDetail?.completedExercises;
+
+    // If nothing is completed, enable FIRST exercise ONLY
+    if (!completed || completed.length === 0) {
+      return chapterIndex === 0 && exerciseIndex === 0;
+    }
+
+    // last completed
+    const last = completed[completed.length - 1];
+
+    // Convert to global exercise number
+    const currentExerciseNumber =
+      chapterIndex * chapterExercisesLength + exerciseIndex + 1;
+
+    const lastCompletedNumber =
+      (last.chapterId - 1) * chapterExercisesLength + last.exerciseId;
+
+    return currentExerciseNumber === lastCompletedNumber + 2;
+  };
+
+
+
+  const isExerciseCompleted = (chapterId: Number, experciseId: Number) => {
+    const completedChapters = courseDetail?.completedExercises;
+
+    const comepletedchapter = completedChapters?.find((item => (item.chapterId == chapterId && item.exerciseId, experciseId)));
+
+    return comepletedchapter ? true : false
+  }
+
+
   return (
     <div>
       {
@@ -54,18 +92,26 @@ function CourseChapters({ loading, courseDetail }: Props) {
                                 <h2 className='text-3xl'>Exercise {(index * chapter?.exercises.length) + indexExc + 1}</h2>
                                 <h2 className='text-3xl'>{exercise.name}</h2>
                               </div>
-                              {/* <Button variant={'pixel'}>{exercise.xp} xp</Button> */}
+                              {
 
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button variant={'pixelDisabled'}>???</Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Please Enroll first</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
+                              }
+                              {EnableExercise(index, indexExc, chapter?.exercises.length) ? <Button variant={'pixel'}>{exercise.xp} xp</Button>
+                                :
+                                isExerciseCompleted(chapter.chapterId, indexExc + 1)
+                                  ?
+                                  <Button variant={'pixel'} className='bg-green-600'>Completed</Button>
+                                  :
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button variant={'pixelDisabled'}>???</Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Please Enroll first</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                              }
                             </div>
                           ))
                         }
