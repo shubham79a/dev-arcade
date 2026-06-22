@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import Link from 'next/link'
 
 type Props = {
   loading: boolean,
@@ -92,25 +93,28 @@ function CourseChapters({ loading, courseDetail }: Props) {
                                 <h2 className='text-3xl'>Exercise {(index * chapter?.exercises.length) + indexExc + 1}</h2>
                                 <h2 className='text-3xl'>{exercise.name}</h2>
                               </div>
-                              {
 
-                              }
-                              {EnableExercise(index, indexExc, chapter?.exercises.length) ? <Button variant={'pixel'}>{exercise.xp} xp</Button>
-                                :
-                                isExerciseCompleted(chapter.chapterId, indexExc + 1)
+                              {
+                                EnableExercise(index, indexExc, chapter?.exercises.length)
                                   ?
-                                  <Button variant={'pixel'} className='bg-green-600'>Completed</Button>
+                                  <Link href={'/courses/' + courseDetail.courseId + '/' + exercise.slug}>
+                                    <Button variant={'pixel'}>{exercise.xp} xp</Button>
+                                  </Link>
                                   :
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button variant={'pixelDisabled'}>???</Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Please Enroll first</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  isExerciseCompleted(chapter.chapterId, indexExc + 1)
+                                    ?
+                                    <Button variant={'pixel'} className='bg-green-600'>Completed</Button>
+                                    :
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button variant={'pixelDisabled'}>???</Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Please Enroll first</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
                               }
                             </div>
                           ))
