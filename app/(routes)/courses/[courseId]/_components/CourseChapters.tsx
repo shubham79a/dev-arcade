@@ -97,7 +97,7 @@ function CourseChapters({ loading, courseDetail }: Props) {
                               {
                                 EnableExercise(index, indexExc, chapter?.exercises.length)
                                   ?
-                                  <Link href={'/courses/' + courseDetail.courseId + '/' + exercise.slug}>
+                                  <Link href={'/courses/' + courseDetail.courseId + '/' + chapter.chapterId + '/' + exercise.slug}>
                                     <Button variant={'pixel'}>{exercise.xp} xp</Button>
                                   </Link>
                                   :
