@@ -16,7 +16,7 @@ export type Course = {
     tags: string,
     chapters?: Chapter[],
     userEnrolled?: boolean,
-    courseEnrolledInfo?: CourseEnrolledInfo[],
+    courseEnrolledInfo?: CourseEnrolledInfo,
     completedExercises?: CompletedExercises[]
 }
 

@@ -19,7 +19,11 @@ function CourseDetail() {
     const [courseDetail, setCourseDetail] = useState<Course>();
     const [loading, setLoading] = useState(false);
 
+    console.log("course detail", courseDetail)
+
     useEffect(() => {
+        console.log("course detail", courseDetail)
+
         courseId && GetCourseDetail();
     }, [courseId])
 

@@ -4,8 +4,11 @@ import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Panel, Group, Separator } from 'react-resizable-panels';
-import { Exercise } from '../../../_components/CourseList';
+import { CompletedExercises, Exercise } from '../../../_components/CourseList';
 import ContentSection from './_components/ContentSection';
+import CodeEditor from './_components/CodeEditor';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 
 export type CourseExercise = {
@@ -14,7 +17,8 @@ export type CourseExercise = {
     desc: string,
     name: string,
     exercises: Exercise[],
-    exerciseData: ExerciseData
+    exerciseData: ExerciseData,
+    completedExercise: CompletedExercises[]
 }
 
 export type ExerciseData = {
@@ -39,6 +43,7 @@ function Playground() {
     const { courseId, chapterId, exerciseslug } = useParams();
     const [loading, setLoading] = useState(false);
     const [courseExerciseData, setCourseExerciseData] = useState<CourseExercise>();
+    const [exerciseInfo, setExerciseInfo] = useState<Exercise>();
 
 
 
@@ -64,21 +69,47 @@ function Playground() {
         setCourseExerciseData(result.data);
     }
 
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        }
+    }, [])
+
+    useEffect(() => {
+        courseExerciseData && GetExerciseDetail();
+    }, [courseExerciseData])
+
+    const GetExerciseDetail = () => {
+        const exerciseInfo = courseExerciseData?.exercises?.find((item) => item.slug === exerciseslug)
+        setExerciseInfo(exerciseInfo);
+    }
+
     return (
         <div className='h-[calc(100vh-80px)] border-t-4'>
             <Group orientation="horizontal">
                 <Panel defaultSize={40} minSize={20}>
-                    <div className='h-full p-4'>
+                    <div className=''>
                         <ContentSection courseExerciseData={courseExerciseData} loading={loading} />
                     </div>
-                </Panel> 
+                </Panel>
                 <Separator className='w-1.5 bg-zinc-700 hover:bg-blue-500 transition-colors' />
                 <Panel defaultSize={60} minSize={30}>
-                    <div className='h-full p-4'>
-                        Code Editor
+                    <div className=''>
+                        <CodeEditor courseExerciseData={courseExerciseData} loading={loading} />
                     </div>
                 </Panel>
             </Group>
+
+            <div className='font-game fixed bottom-0 w-full bg-zinc-900 flex p-4 justify-between items-center'>
+                <Button variant={'pixel'} className='text-xl'>Prvious</Button>
+                <div className='flex gap-3 items-center'>
+                    <Image src='/star.png' alt='xp-star' width={40} height={40} />
+                    <h2 className='text-2xl '>You can earn <span className='text-green-400 text-4xl'>{exerciseInfo?.xp}</span> Xp</h2>
+                </div>
+                <Button variant={'pixel'} className='text-xl'>Next</Button>
+            </div>
+
         </div>
     )
 }

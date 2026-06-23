@@ -54,7 +54,7 @@ function CourseChapters({ loading, courseDetail }: Props) {
   const isExerciseCompleted = (chapterId: Number, experciseId: Number) => {
     const completedChapters = courseDetail?.completedExercises;
 
-    const comepletedchapter = completedChapters?.find((item => (item.chapterId == chapterId && item.exerciseId, experciseId)));
+    const comepletedchapter = completedChapters?.find((item => (item.chapterId == chapterId && item.exerciseId == experciseId)));
 
     return comepletedchapter ? true : false
   }

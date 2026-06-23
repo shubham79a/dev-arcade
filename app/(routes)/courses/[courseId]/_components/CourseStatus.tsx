@@ -54,8 +54,8 @@ function CourseStatus({ courseDetail }: Props) {
             <div className='flex items-center gap-5 mt-4'>
                 <Image src={'/star.png'} alt='book' width={50} height={50} />
                 <div className='w-full'>
-                    <h2 className='flex justify-between text-2xl w-full'>XP Earned <span className='text-gray-400'>{courseDetail?.courseEnrolledInfo?.[0]?.xpEarned ?? 0}/{counts?.totalXp}</span></h2>
-                    <Progress value={updateProgress(courseDetail?.courseEnrolledInfo?.[0]?.xpEarned ?? 0, counts?.totalXp ?? 0)} className='mt-2' />
+                    <h2 className='flex justify-between text-2xl w-full'>XP Earned <span className='text-gray-400'>{courseDetail?.courseEnrolledInfo?.xpEarned ?? 0}/{counts?.totalXp}</span></h2>
+                    <Progress value={updateProgress(courseDetail?.courseEnrolledInfo?.xpEarned ?? 0, counts?.totalXp ?? 0)} className='mt-2' />
                 </div>
             </div>
 

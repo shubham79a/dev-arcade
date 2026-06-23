@@ -13,7 +13,7 @@ function ContentSection({ courseExerciseData, loading }: Props) {
     const contentInfo = courseExerciseData?.exerciseData;
 
     return (
-        <div className='p-10'>
+        <div className='p-10 mb-32 '>
             {
                 loading || !contentInfo
                     ?
