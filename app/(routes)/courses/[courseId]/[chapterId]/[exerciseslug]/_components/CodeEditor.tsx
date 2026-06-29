@@ -63,7 +63,7 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
 
         // console.log(courseExerciseData?.exercises[exerciseIndex])
         // console.log(courseExerciseData?.exercises[exerciseIndex].xp);
-
+ 
         const result = await axios.post('/api/exercise/complete', {
             courseId: courseExerciseData?.courseId,
             chapterId: courseExerciseData?.chapterId,
