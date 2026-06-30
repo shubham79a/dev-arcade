@@ -49,7 +49,7 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
 
     const exerciseIndex = courseExerciseData?.exercises.findIndex(item => item.slug === exerciseslug);
 
-    const IsCompleted = courseExerciseData?.completedExercise.find((item) => item.exerciseId, exerciseIndex);
+    const IsCompleted = courseExerciseData?.completedExercise.find((item) => item.exerciseId === (exerciseIndex !== undefined ? exerciseIndex + 1 : -1));
 
     const onCompleteExercise = async () => {
         if (IsCompleted) {
@@ -61,20 +61,25 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
 
         if (exerciseIndex == undefined) return;
 
-        // console.log(courseExerciseData?.exercises[exerciseIndex])
-        // console.log(courseExerciseData?.exercises[exerciseIndex].xp);
- 
-        const result = await axios.post('/api/exercise/complete', {
-            courseId: courseExerciseData?.courseId,
-            chapterId: courseExerciseData?.chapterId,
-            exerciseId: exerciseIndex + 1,
-            xpEarned: courseExerciseData?.exercises[exerciseIndex].xp
-        })
+        try {
+            const result = await axios.post('/api/exercise/complete', {
+                courseId: courseExerciseData?.courseId,
+                chapterId: courseExerciseData?.chapterId,
+                exerciseId: exerciseIndex + 1,
+                xpEarned: courseExerciseData?.exercises[exerciseIndex].xp
+            })
 
-        console.log(result);
-
-        toast.success('Exercise completed successfully');
-
+            console.log(result);
+            toast.success('Exercise completed successfully');
+        } catch (error: any) {
+            if (error?.response?.status === 403) {
+                toast.error('Please enroll in the course first!');
+            } else if (error?.response?.status === 409) {
+                toast.error('Exercise already completed!');
+            } else {
+                toast.error('Something went wrong');
+            }
+        }
     }
 
     return (

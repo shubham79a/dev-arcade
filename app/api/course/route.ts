@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         const isEnrolledCourse = enrolledCourse.length > 0 ? true : false;
 
         // @ts-ignore
-        const completedExercises = await db.select().from(CompletedExerciseTable).where(and(eq(CompletedExerciseTable.courseId, courseId), eq(CompletedExerciseTable.userId, user?.primaryEmailAddress?.emailAddress).order))
+        const completedExercises = await db.select().from(CompletedExerciseTable).where(and(eq(CompletedExerciseTable.courseId, courseId), eq(CompletedExerciseTable.userId, user?.primaryEmailAddress?.emailAddress)))
             .orderBy(desc(CompletedExerciseTable.courseId), desc(CompletedExerciseTable.exerciseId));
 
         return NextResponse.json(
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
                 ...result[0],
                 chapters: chapterResult,
                 userEnrolled: isEnrolledCourse,
-                courseEnrolledInfo: enrolledCourse,
+                courseEnrolledInfo: enrolledCourse[0],
                 completedExercises: completedExercises
             }
         );

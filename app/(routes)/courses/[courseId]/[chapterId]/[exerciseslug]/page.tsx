@@ -1,7 +1,7 @@
 'use client'
 
 import axios from 'axios';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Panel, Group, Separator } from 'react-resizable-panels';
 import { CompletedExercises, Exercise } from '../../../_components/CourseList';
@@ -9,6 +9,7 @@ import ContentSection from './_components/ContentSection';
 import CodeEditor from './_components/CodeEditor';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 
 export type CourseExercise = {
@@ -41,6 +42,7 @@ export type ExerciseContent = {
 function Playground() {
 
     const { courseId, chapterId, exerciseslug } = useParams();
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [courseExerciseData, setCourseExerciseData] = useState<CourseExercise>();
     const [exerciseInfo, setExerciseInfo] = useState<Exercise>();
@@ -58,15 +60,23 @@ function Playground() {
 
     const GetExerciseCourseDetail = async () => {
         setLoading(true);
-        const result = await axios.post('/api/exercise', {
-            courseId: courseId,
-            chapterId: chapterId,
-            exerciseId: exerciseslug
-        })
-        setLoading(false);
+        try {
+            const result = await axios.post('/api/exercise', {
+                courseId: courseId,
+                chapterId: chapterId,
+                exerciseId: exerciseslug
+            })
+            setLoading(false);
 
-        console.log(result.data);
-        setCourseExerciseData(result.data);
+            console.log(result.data);
+            setCourseExerciseData(result.data);
+        } catch (error: any) {
+            setLoading(false);
+            if (error?.response?.status === 403) {
+                toast.error('Please enroll in the course first!');
+                router.push('/courses/' + courseId);
+            }
+        }
     }
 
     useEffect(() => {
