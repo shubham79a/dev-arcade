@@ -15,7 +15,8 @@ export const CourseTable = pgTable("courses", {
     desc: varchar().notNull(),
     bannerImage: varchar().notNull(),
     level: varchar().default('Beginner'),
-    tags: varchar()
+    tags: varchar(),
+    editorType: varchar().default('static')
 })
 
 export const CourseChaptersTable = pgTable("courseChapters", {
@@ -52,4 +53,3 @@ export const ExerciseTable = pgTable('exercise', {
     exercisesContent: json(),
     exerciseName: varchar()
 })
- 

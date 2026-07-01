@@ -17,6 +17,7 @@ export type CourseExercise = {
     courseId: number,
     desc: string,
     name: string,
+    editorType: string,
     exercises: Exercise[],
     exerciseData: ExerciseData,
     completedExercise: CompletedExercises[]

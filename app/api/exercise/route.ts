@@ -1,5 +1,5 @@
 import { db } from "@/config/db";
-import { CompletedExerciseTable, CourseChaptersTable, EnrolledCourseTable, ExerciseTable } from "@/config/schema";
+import { CompletedExerciseTable, CourseChaptersTable, CourseTable, EnrolledCourseTable, ExerciseTable } from "@/config/schema";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
@@ -25,6 +25,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Please enroll in the course first", enrolled: false }, { status: 403 });
     }
 
+    const courseInfo = await db.select().from(CourseTable).where(eq(CourseTable.courseId, courseIdNum))
+
     // @ts-ignore
     const courseResult = await db.select().from(CourseChaptersTable).where(and(eq(CourseChaptersTable.courseId, courseIdNum), eq(CourseChaptersTable.chapterId, chapterIdNum)));
 
@@ -38,6 +40,7 @@ export async function POST(req: NextRequest) {
         ...courseResult[0],
         exerciseData: exerciseResult[0],
         completedExercise: completedExercise,
+        editorType: courseInfo[0].editorType
     })
 
 }

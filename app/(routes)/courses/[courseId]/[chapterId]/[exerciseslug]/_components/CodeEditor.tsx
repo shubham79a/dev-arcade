@@ -30,7 +30,7 @@ const CodeEditorChildren = ({ onCompleteExercise, IsCompleted }: any) => {
                 onClick={() => sandpack.runSandpack()}
             >
                 Run Code
-            </Button> 
+            </Button>
             <Button variant={'pixel'} className='bg-[#a3e534] text-xl' size={'lg'}
                 onClick={() => onCompleteExercise()}
                 disabled={IsCompleted}
@@ -84,7 +84,9 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
 
     return (
         <div>
-            <SandpackProvider template="static"
+            <SandpackProvider
+                //@ts-ignore
+                template={courseExerciseData?.editorType ?? 'react'}
                 style={{
                     height: '100vh'
                 }}
