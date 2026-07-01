@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +14,9 @@ import {
 import Link from 'next/link'
 import { UserButton, useUser } from '@clerk/nextjs'
 import { useParams, usePathname } from 'next/navigation'
+import axios from 'axios'
+import { Course } from '../(routes)/courses/_components/CourseList'
+
 
 
 const courses = [
@@ -74,11 +77,28 @@ const courses = [
 ];
 
 
+
 function Header() {
     const { user } = useUser();
 
     const path = usePathname();
     const { exerciseslug } = useParams();
+
+    const [allCourses, setAllCourses] = useState<Course[]>([]);
+
+    const GetCourses = async () => {
+        try {
+            const result = await axios.get('/api/course');
+            console.log("api result", result.data.result);
+            setAllCourses(result.data.result);
+        } catch (error: any) {
+            console.log(error.response.data);
+        }
+    }
+
+    useEffect(() => {
+        GetCourses();
+    }, []);
 
     return (
         <div className='p-4 max-w-7xl flex justify-between items-center w-full'>
@@ -98,14 +118,16 @@ function Header() {
                             <NavigationMenuItem>
                                 <NavigationMenuTrigger>Courses</NavigationMenuTrigger>
                                 <NavigationMenuContent>
-                                    <ul className='grid md:grid-cols-2 gap-2 sm:w-[400px] md:w-[500px] lg:w-[600px]'>
+                                    <ul className='grid md:grid-cols-2 gap-2 sm:w-[400px] md:w-[500px] lg:w-[600px] p-2'>
                                         {
-                                            courses.map((course, index) => {
+                                            allCourses.map((course, index) => {
                                                 return (
-                                                    <li key={index} className='p-2 hover:bg-accent rounded-xl cursor-pointer'>
-                                                        <h2 className='font-medium'>{course.name}</h2>
-                                                        <p className='text-sm text-gray-500'>{course.desc}</p>
-                                                    </li>
+                                                    <Link key={index} href={'/courses/' + course?.courseId}>
+                                                        <li className='p-3 hover:bg-accent rounded-xl cursor-pointer'>
+                                                            <h2 className='font-medium'>{course.title}</h2>
+                                                            <p className='text-sm text-gray-500'>{course.desc}</p>
+                                                        </li>
+                                                    </Link>
                                                 )
                                             })
                                         }

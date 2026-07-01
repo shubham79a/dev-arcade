@@ -7,7 +7,7 @@ import CourseChapters from './_components/CourseChapters';
 import axios from 'axios';
 import { Course } from '../_components/CourseList';
 import CourseStatus from './_components/CourseStatus';
-import UpgradeToPro from '@/app/_components/UpgradeToPro';
+import UpgradeToPro from '@/app/(routes)/dashboard/_components/UpgradeToPro';
 import CommunityHelp from './_components/CommunityHelp';
 
 

@@ -1,10 +1,11 @@
-import EnrolledCourses from '@/app/_components/EnrolledCourses'
-import ExploreMore from '@/app/_components/ExploreMore'
-import InviteFriend from '@/app/_components/InviteFriend'
-import UpgradeToPro from '@/app/_components/UpgradeToPro'
-import UserStatus from '@/app/_components/UserStatus'
-import WelcomeBanner from '@/app/_components/WelcomeBanner'
+import EnrolledCourses from '@/app/(routes)/dashboard/_components/EnrolledCourses'
+import ExploreMore from '@/app/(routes)/dashboard/_components/ExploreMore'
+import InviteFriend from '@/app/(routes)/dashboard/_components/InviteFriend'
+import UpgradeToPro from '@/app/(routes)/dashboard/_components/UpgradeToPro'
+import UserStatus from '@/app/(routes)/dashboard/_components/UserStatus'
+import WelcomeBanner from '@/app/(routes)/dashboard/_components/WelcomeBanner'
 import React from 'react'
+import ExploreMoreCourses from './_components/ExploreMoreCourses'
 
 function Dashboard() {
     return (
@@ -13,6 +14,7 @@ function Dashboard() {
                 <div className='col-span-2'>
                     <WelcomeBanner />
                     <EnrolledCourses />
+                    <ExploreMoreCourses />
                     <ExploreMore />
                     <InviteFriend />
                 </div>
