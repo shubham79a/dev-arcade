@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Hero from "./_components/Hero";
+import PopularCourses from "./_components/PopularCourses";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
 
       {/* hero  */}
       <Hero />
+      <PopularCourses />
     </div>
   );
 }
