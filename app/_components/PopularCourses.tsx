@@ -8,9 +8,9 @@ function PopularCourses() {
         <div>
             <div className='font-game flex flex-col items-center justify-center'>
                 <h2 className='text-2xl md:text-3xl lg:text-5xl mt-10'>Popular Course to Explore</h2>
-                <h2 className='text-xl md:text-2xl lg:text-3xl'>Learn Coding with interactive courses, Practical handson with real life experiences!</h2>
+                <h2 className='text-md md:text-2xl lg:text-3xl text-center'>Learn Coding with interactive courses, Practical handson with real life experiences!</h2>
             </div>
-            <div className='mt-8 px-10 md:px-24 lg:px-32 mb-16'>
+            <div className='mt-8 px-4 md:px-20 lg:px-28 mb-16'>
                 <CourseList maxLimit={8} />
                 <Link href={'/courses'} className='flex items-center justify-center'>
                     <Button variant={'pixel'} size={'lg'} className=' mt-8 cursor-pointer'>
