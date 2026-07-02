@@ -105,7 +105,7 @@ function Header() {
             <div className='flex gap-2 items-center'>
                 <Link href="/" className='flex gap-2 items-center'>
                     <Image src={'/angry.png'} alt="logo" width={40} height={40} />
-                    <h2 className='font-bold text-3xl font-game'>Interview  OS</h2>
+                    <h2 className='font-bold text-3xl font-game'>DevArcade</h2>
                 </Link>
             </div>
 
