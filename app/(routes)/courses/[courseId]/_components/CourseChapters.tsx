@@ -75,19 +75,19 @@ function CourseChapters({ loading, courseDetail }: Props) {
             <Skeleton className='w-full h-[100px] roundex-xl mt-5' />
           </div>
           :
-          <div className='p-5 border-4 rounded-2xl '>
+          <div className='max-sm:p-2 md:p-4 p-5 border-4 rounded-2xl '>
             {
               courseDetail?.chapters?.map((chapter, index) => (
                 <Accordion type="single" collapsible key={index}>
                   <AccordionItem value='item-1'>
-                    <AccordionTrigger className='p-3 hover:bg-zinc-800 font-game text-4xl'>
+                    <AccordionTrigger className='md:p-3 hover:bg-zinc-800 font-game text-4xl'>
                       <div className='flex items-center justify-between w-full'>
 
-                        <div className='flex gap-10'>
-                          <h2 className='w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center'>
+                        <div className='flex max-md:gap-7 max-sm:gap-4 gap-10'>
+                          <h2 className='max-sm:w-8 max-sm:h-8 max-sm:text-xl w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center'>
                             {index + 1}.
                           </h2>
-                          <h2>{chapter?.name} </h2>
+                          <h2 className='max-sm:text-xl text-3xl lg:text-4xl'>{chapter?.name} </h2>
                         </div>
                         {
                           !hasPremiumAccess
@@ -97,13 +97,13 @@ function CourseChapters({ loading, courseDetail }: Props) {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className='p-7 bg-zinc-900 rounded-2xl '>
+                      <div className='max-sm:px-2 max-sm:py-3 sm:p-4 md:p-7 bg-zinc-900 rounded-2xl '>
                         {
                           chapter.exercises.map((exercise, indexExc) => (
                             <div key={indexExc} className='flex items-center justify-between mb-7' >
-                              <div className='flex items-center gap-10 font-game'>
-                                <h2 className='text-3xl'>Exercise {(index * chapter?.exercises.length) + indexExc + 1}</h2>
-                                <h2 className='text-3xl'>{exercise.name}</h2>
+                              <div className='flex items-center justify-between max-md:gap-7 max-sm:gap-3 gap-10 font-game'>
+                                <h2 className='max-sm:text-lg text-2xl lg:text-3xl'><span className='max-sm:hidden'>Exercise</span> {(index * chapter?.exercises.length) + indexExc + 1}</h2>
+                                <h2 className='max-sm:text-lg text-2xl lg:text-3xl'>{exercise.name}</h2>
                               </div>
 
                               {/* {

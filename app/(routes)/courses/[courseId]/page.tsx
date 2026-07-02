@@ -36,17 +36,17 @@ function CourseDetail() {
     }
 
     return (
-        <div>
+        <div className=''>
             <CourseDetailBanner
                 courseDetail={courseDetail}
                 loading={loading}
                 refreshData={() => GetCourseDetail()}
             />
-            <div className='grid grid-cols-3 p-10 md:px-24 lg:px-36 gap-7'>
-                <div className='col-span-2'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-7 mt-4 px-4 md:px-20 lg:px-28 mb-16'>
+                <div className='md:col-span-2'>
                     <CourseChapters courseDetail={courseDetail} loading={loading} />
                 </div>
-                <div className='col-span-1'>
+                <div className='md:col-span-1'>
                     <CourseStatus courseDetail={courseDetail} />
                     <UpgradeToPro />
                     <CommunityHelp />
