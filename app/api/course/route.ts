@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
     const userEmail = user?.primaryEmailAddress?.emailAddress;
 
-    if (!userEmail) {
+    if (!userEmail && courseId === 'enrolled') {
         return NextResponse.json({ error: "User not authenticated" });
     }
 
@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
         const enrolledCourses = await db
             .select()
             .from(EnrolledCourseTable)
+            //@ts-ignore
             .where(eq(EnrolledCourseTable.userId, userEmail));
 
         if (enrolledCourses.length === 0) {
