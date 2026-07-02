@@ -1,10 +1,17 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@clerk/nextjs';
 import Image from 'next/image'
 import Link from 'next/link'
 
 
 function UpgradeToPro() {
-    return (
+
+    const { has } = useAuth();
+    const hasPremiumAccess = has({ plan: 'unlimited' });
+
+    return !hasPremiumAccess && (
         <div className='flex items-center flex-col p-5 border-4 rounded-2xl mt-8'>
             <Image src={'/logo.png'} alt='logo' width={70} height={70} />
             <h2 className='text-3xl font-game'>Upgrade to Pro</h2>

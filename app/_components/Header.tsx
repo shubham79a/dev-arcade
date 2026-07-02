@@ -90,7 +90,7 @@ function Header() {
         try {
             const result = await axios.get('/api/course');
             console.log("api result", result.data.result);
-            setAllCourses(result.data.result);
+            setAllCourses(result.data.result ?? []);
         } catch (error: any) {
             console.log(error.response.data);
         }
@@ -120,7 +120,7 @@ function Header() {
                                 <NavigationMenuContent>
                                     <ul className='grid md:grid-cols-2 gap-2 sm:w-[400px] md:w-[500px] lg:w-[600px] p-2'>
                                         {
-                                            allCourses.map((course, index) => {
+                                            allCourses?.map((course, index) => {
                                                 return (
                                                     <Link key={index} href={'/courses/' + course?.courseId}>
                                                         <li className='p-3 hover:bg-accent rounded-xl cursor-pointer'>
