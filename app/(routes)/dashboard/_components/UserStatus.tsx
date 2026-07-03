@@ -11,10 +11,12 @@ function UserStatus() {
     const { userDetail, setUserDetail } = useContext(UserDetailContext)
 
     return (
-        <div className='p-4 border-4 rounded-2xl '>
+        <div className='p-4 max-sm:p-3 border-4 rounded-2xl '>
             <div className='flex gap-3 items-center'>
-                <Image src={'/alex_walk.gif'} alt='walking-user' width={70} height={70} />
-                <h2 className='font-game text-xl break-all min-w-0'>
+                <Image src={'/alex_walk.gif'} alt='walking-user' width={70} height={70}
+                    className='max-sm:w-[50px] max-sm:h-[50px]'
+                />
+                <h2 className='font-game max-sm:text-base text-xl break-all min-w-0'>
                     {user?.primaryEmailAddress?.emailAddress}
                 </h2>
             </div>

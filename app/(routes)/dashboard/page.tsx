@@ -9,18 +9,25 @@ import ExploreMoreCourses from './_components/ExploreMoreCourses'
 
 function Dashboard() {
     return (
-        <div className='p-10 md:px-20 lg:px-36 xl:px-48'>
-            <div className='grid grid-cols-3 gap-7'>
-                <div className='col-span-2'>
+        <div className='p-4 md:px-20 lg:px-36 xl:px-48'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-7'>
+                {/* Welcome Banner - always first */}
+                <div className='md:col-span-2'>
                     <WelcomeBanner />
+                </div>
+
+                {/* Sidebar - appears after banner on mobile, right column on desktop */}
+                <div className='md:col-span-1 md:row-span-2'>
+                    <UserStatus />
+                    <UpgradeToPro />
+                </div>
+
+                {/* Rest of main content */}
+                <div className='md:col-span-2'>
                     <EnrolledCourses />
                     <ExploreMoreCourses />
                     <ExploreMore />
                     <InviteFriend />
-                </div>
-                <div className='col-span-1'>
-                    <UserStatus />
-                    <UpgradeToPro />
                 </div>
             </div>
 
