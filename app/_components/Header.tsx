@@ -11,11 +11,19 @@ import {
     NavigationMenuList,
     NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
 import Link from 'next/link'
 import { UserButton, useUser } from '@clerk/nextjs'
 import { useParams, usePathname } from 'next/navigation'
 import axios from 'axios'
 import { Course } from '../(routes)/courses/_components/CourseList'
+import { Menu } from 'lucide-react'
 
 
 
@@ -85,6 +93,7 @@ function Header() {
     const { exerciseslug } = useParams();
 
     const [allCourses, setAllCourses] = useState<Course[]>([]);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     const GetCourses = async () => {
         try {
@@ -103,17 +112,68 @@ function Header() {
     return (
         <div className='p-4 max-w-7xl flex justify-between items-center w-full'>
             <div className='flex gap-2 items-center'>
-                <Link href="/" className='flex gap-2 items-center'>
+                {/* mobile menu button */}
+                {
+                    !exerciseslug &&
+                    <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+                        <SheetTrigger asChild>
+                            <Button variant='ghost' size='icon' className='sm:hidden cursor-pointer'>
+                                <Menu className='w-6 h-6' />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side='left' className='w-[280px] bg-zinc-950 border-zinc-800'>
+                            <SheetHeader>
+                                <SheetTitle className='font-game text-2xl flex items-center gap-2'>
+                                    <Image src={'/angry.png'} alt='logo' width={30} height={30} />
+                                    DevArcade
+                                </SheetTitle>
+                            </SheetHeader>
+                            <nav className='flex flex-col gap-1 mt-6 px-2'>
+                                <h3 className='font-game text-lg text-gray-400 mb-2'>Courses</h3>
+                                {allCourses?.map((course, index) => (
+                                    <Link
+                                        key={index}
+                                        href={'/courses/' + course?.courseId}
+                                        onClick={() => setMobileOpen(false)}
+                                        className='p-3 hover:bg-zinc-800 rounded-xl cursor-pointer'
+                                    >
+                                        <h2 className='font-medium text-sm'>{course.title}</h2>
+                                    </Link>
+                                ))}
+
+                                <div className='border-t border-zinc-800 my-3' />
+
+                                <Link href='/' onClick={() => setMobileOpen(false)}
+                                    className='p-3 hover:bg-zinc-800 rounded-xl font-game text-lg'>
+                                    Contest
+                                </Link>
+                                {/* <Link href='/' onClick={() => setMobileOpen(false)}
+                                    className='p-3 hover:bg-zinc-800 rounded-xl font-game text-lg'>
+                                    Projects
+                                </Link> */}
+                                <Link href='/pricing' onClick={() => setMobileOpen(false)}
+                                    className='p-3 hover:bg-zinc-800 rounded-xl font-game text-lg'>
+                                    Pricing
+                                </Link>
+                                <Link href='/contact-us' onClick={() => setMobileOpen(false)}
+                                    className='p-3 hover:bg-zinc-800 rounded-xl font-game text-lg'>
+                                    Contact Us
+                                </Link>
+                            </nav>
+                        </SheetContent>
+                    </Sheet>
+                }
+                <Link href="/" className='flex gap-2 items-center height-[28px]'>
                     <Image src={'/angry.png'} alt="logo" width={40} height={40} />
-                    <h2 className='font-bold text-3xl font-game'>DevArcade</h2>
+                    <h2 className='font-bold max-sm:hidden text-3xl font-game'>DevArcade</h2>
                 </Link>
             </div>
 
-            {/* navbar */}
+            {/* desktop navbar */}
 
             {
                 !exerciseslug ?
-                    <NavigationMenu>
+                    <NavigationMenu className='max-sm:hidden'>
                         <NavigationMenuList className='gap-2'>
                             <NavigationMenuItem>
                                 <NavigationMenuTrigger>Courses</NavigationMenuTrigger>
@@ -136,14 +196,14 @@ function Header() {
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <NavigationMenuLink asChild>
-                                    <Link href="/contest">Contest</Link>
+                                    <Link href="/">Contest</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
-                            <NavigationMenuItem>
+                            {/* <NavigationMenuItem>
                                 <NavigationMenuLink asChild>
-                                    <Link href="/projects">Projects</Link>
+                                    <Link href="/">Projects</Link>
                                 </NavigationMenuLink>
-                            </NavigationMenuItem>
+                            </NavigationMenuItem> */}
                             <NavigationMenuItem>
                                 <NavigationMenuLink asChild>
                                     <Link href="/pricing">Pricing</Link>

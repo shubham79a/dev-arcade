@@ -6,8 +6,8 @@ import Link from 'next/link'
 function ExploreMoreCourses() {
     return (
         <div className='my-8'>
-            <div className='mt-7 flex justify-between items-center'>
-                <h2 className='font-game text-3xl mb-2'>
+            <div className='mt-7 flex justify-between items-center gap-2'>
+                <h2 className='font-game max-sm:text-2xl text-3xl mb-2'>
                     Explore Other Courses
                 </h2>
                 <Link href={'/courses'}>

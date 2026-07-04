@@ -20,8 +20,8 @@ function CourseProgressCard({ course }: Props) {
                 />
                 <div className='font-game p-4'>
                     <h2 className='text-lg font-light text-gray-500 '>Course</h2>
-                    <h2 className='text-3xl'>{course?.title}</h2>
-                    <h2 className='mt-3 text-lg text-gray-400'>{course.completedExercises} Completed out of<span>{course.totalExercises}</span></h2>
+                    <h2 className='max-sm:text-2xl text-3xl'>{course?.title}</h2>
+                    <h2 className='mt-3 max-sm:text-sm text-lg text-gray-400'>{course.completedExercises} Completed out of<span> {course.totalExercises}</span></h2>
                     <Progress
                         value={(course.completedExercises / course.totalExercises) * 100}
                     />

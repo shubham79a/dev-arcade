@@ -12,17 +12,17 @@ function Hero() {
             />
 
             <div className='absolute w-full flex flex-col items-center mt-24'>
-                <h2 className='font-bold text-7xl font-game'>
+                <h2 className='font-bold max-sm:text-4xl text-5xl lg:text-8xl font-game'>
                     Start Your
                 </h2>
-                <h2 className='font-bold text-8xl font-game text-yellow-400'
+                <h2 className='font-bold max-sm:text-4xl text-5xl lg:text-8xl font-game text-yellow-400'
                     style={{
                         textShadow: "2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000"
                     }}
                 >
                     Coding Adventure
                 </h2>
-                <h2 className='mt-5 font-game text-3xl'>
+                <h2 className='mt-5 font-game max-sm:text-center max-sm:text-xl text-3xl lg:text-4xl'>
                     Beginner friendly coding courses and projects.
                 </h2>
                 <Link href={'/sign-in'}>
