@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react'
 
 export type Course = {
     id: number,
-    courseId: number,
     title: string,
     desc: string,
     bannerImage: string,
@@ -21,9 +20,12 @@ export type Course = {
 }
 
 export type CompletedExercises = {
+    id: number,
     chapterId: number,
     exerciseId: number,
     courseId: number,
+    usedHint: boolean,
+    xpAwarded: number,
 }
 
 export type CourseEnrolledInfo = {
@@ -32,19 +34,21 @@ export type CourseEnrolledInfo = {
 }
 
 export type Chapter = {
-    chapterId: number,
+    id: number,
     courseId: number,
+    orderIndex: number,
     desc: string,
     name: string,
-    id: number,
     exercises: Exercise[]
 }
 
 export type Exercise = {
+    id: number,
     name: string,
     slug: string,
     xp: number,
     difficulty: string,
+    orderIndex: number,
 }
 
 type Props = {
@@ -73,7 +77,7 @@ function CourseList({ smallerCard = false, maxLimit = 999 }: Props) {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5 mt-3'>
             {
                 !loading && courseList?.map((course, index) => maxLimit > index && (
-                    <Link key={index} href={'/courses/' + course?.courseId}>
+                    <Link key={index} href={'/courses/' + course?.id}>
                         <div className='border-4 rounded-xl hover:bg-zinc-900 cursor-pointer'>
                             <Image src={(course?.bannerImage).trimEnd()}
                                 alt={course?.title}

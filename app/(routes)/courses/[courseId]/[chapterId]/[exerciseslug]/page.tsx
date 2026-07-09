@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 
 
 export type CourseExercise = {
-    chapterId: number,
+    id: number,
     courseId: number,
     desc: string,
     name: string,
@@ -24,19 +24,20 @@ export type CourseExercise = {
 }
 
 export type ExerciseData = {
-    chapterId: number,
+    id: number,
     courseId: number,
-    exerciseId: string,
-    exerciseName: string,
-    exercisesContent: ExerciseContent,
-}
-
-export type ExerciseContent = {
+    chapterId: number,
+    slug: string,
+    name: string,
+    xp: number,
+    difficulty: string,
+    hintXpPenalty: number,
     content: string,
-    hint: string,
-    hintXp: string,
-    starterCode: any,
     task: string,
+    hint: string,
+    starterCode: any,
+    validationRegex: string,
+    expectedOutput: string,
 }
 
 
@@ -46,7 +47,6 @@ function Playground() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [courseExerciseData, setCourseExerciseData] = useState<CourseExercise>();
-    const [exerciseInfo, setExerciseInfo] = useState<Exercise>();
 
 
 
@@ -87,15 +87,6 @@ function Playground() {
         }
     }, [])
 
-    useEffect(() => {
-        courseExerciseData && GetExerciseDetail();
-    }, [courseExerciseData])
-
-    const GetExerciseDetail = () => {
-        const exerciseInfo = courseExerciseData?.exercises?.find((item) => item.slug === exerciseslug)
-        setExerciseInfo(exerciseInfo);
-    }
-
     return (
         <div className='h-[calc(100vh-80px)] border-t-4'>
             <Group orientation="horizontal">
@@ -116,7 +107,7 @@ function Playground() {
                 <Button variant={'pixel'} className='text-xl'>Prvious</Button>
                 <div className='flex gap-3 items-center'>
                     <Image src='/star.png' alt='xp-star' width={40} height={40} />
-                    <h2 className='text-2xl '>You can earn <span className='text-green-400 text-4xl'>{exerciseInfo?.xp}</span> Xp</h2>
+                    <h2 className='text-2xl '>You can earn <span className='text-green-400 text-4xl'>{courseExerciseData?.exerciseData?.xp}</span> Xp</h2>
                 </div>
                 <Button variant={'pixel'} className='text-xl'>Next</Button>
             </div>
@@ -126,4 +117,3 @@ function Playground() {
 }
 
 export default Playground
-

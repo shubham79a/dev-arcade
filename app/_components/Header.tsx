@@ -133,7 +133,7 @@ function Header() {
                                 {allCourses?.map((course, index) => (
                                     <Link
                                         key={index}
-                                        href={'/courses/' + course?.courseId}
+                                        href={'/courses/' + course?.id}
                                         onClick={() => setMobileOpen(false)}
                                         className='p-3 hover:bg-zinc-800 rounded-xl cursor-pointer'
                                     >
@@ -182,7 +182,7 @@ function Header() {
                                         {
                                             allCourses?.map((course, index) => {
                                                 return (
-                                                    <Link key={index} href={'/courses/' + course?.courseId}>
+                                                    <Link key={index} href={'/courses/' + course?.id}>
                                                         <li className='p-3 hover:bg-accent rounded-xl cursor-pointer'>
                                                             <h2 className='font-medium'>{course.title}</h2>
                                                             <p className='text-sm text-gray-500'>{course.desc}</p>
