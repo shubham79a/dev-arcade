@@ -20,7 +20,7 @@ function CourseDetailBanner({ loading, courseDetail, refreshData }: Props) {
   const EnrollCourse = async () => {
     setEnrollLoading(true);
     const result = await axios.post('/api/enroll-course', {
-      courseId: courseDetail?.courseId
+      courseId: courseDetail?.id
     });
     // console.log(result);
     toast.success('Course Enrolled');

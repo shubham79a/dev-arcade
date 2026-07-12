@@ -47,9 +47,10 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
 
     const { exerciseslug } = useParams();
 
-    const exerciseIndex = courseExerciseData?.exercises.findIndex(item => item.slug === exerciseslug);
+    // Use actual exercise.id from the database instead of fragile index math
+    const currentExercise = courseExerciseData?.exercises?.find(item => item.slug === exerciseslug);
 
-    const IsCompleted = courseExerciseData?.completedExercise.find((item) => item.exerciseId === (exerciseIndex !== undefined ? exerciseIndex + 1 : -1));
+    const IsCompleted = courseExerciseData?.completedExercise?.find((item) => item.exerciseId === currentExercise?.id);
 
     const onCompleteExercise = async () => {
         if (IsCompleted) {
@@ -57,16 +58,14 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
             return;
         }
 
-        console.log(exerciseIndex);
-
-        if (exerciseIndex == undefined) return;
+        if (!currentExercise) return;
 
         try {
             const result = await axios.post('/api/exercise/complete', {
                 courseId: courseExerciseData?.courseId,
-                chapterId: courseExerciseData?.chapterId,
-                exerciseId: exerciseIndex + 1,
-                xpEarned: courseExerciseData?.exercises[exerciseIndex].xp
+                chapterId: courseExerciseData?.id,
+                exerciseId: currentExercise?.id,
+                usedHint: false, // TODO: track if user revealed hint
             })
 
             console.log(result);
@@ -91,7 +90,7 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
                     height: '100vh'
                 }}
                 files={
-                    courseExerciseData?.exerciseData?.exercisesContent?.starterCode
+                    courseExerciseData?.exerciseData?.starterCode
                 }
                 options={
                     {

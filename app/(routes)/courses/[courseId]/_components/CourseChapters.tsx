@@ -28,39 +28,9 @@ function CourseChapters({ loading, courseDetail }: Props) {
   const { has } = useAuth();
   const hasPremiumAccess = has({ plan: 'unlimited' });
 
-  const EnableExercise = (
-    chapterIndex: number,
-    exerciseIndex: number,
-    chapterExercisesLength: number
-  ) => {
-    const completed = courseDetail?.completedExercises;
-
-    // If nothing is completed, enable FIRST exercise ONLY
-    if (!completed || completed.length === 0) {
-      return chapterIndex === 0 && exerciseIndex === 0;
-    }
-
-    // last completed
-    const last = completed[completed.length - 1];
-
-    // Convert to global exercise number
-    const currentExerciseNumber =
-      chapterIndex * chapterExercisesLength + exerciseIndex + 1;
-
-    const lastCompletedNumber =
-      (last.chapterId - 1) * chapterExercisesLength + last.exerciseId;
-
-    return currentExerciseNumber === lastCompletedNumber + 2;
-  };
-
-
-
-  const isExerciseCompleted = (chapterId: Number, experciseId: Number) => {
+  const isExerciseCompleted = (exerciseDbId: number) => {
     const completedChapters = courseDetail?.completedExercises;
-
-    const comepletedchapter = completedChapters?.find((item => (item.chapterId == chapterId && item.exerciseId == experciseId)));
-
-    return comepletedchapter ? true : false
+    return completedChapters?.some(item => item.exerciseId === exerciseDbId) ?? false;
   }
 
 
@@ -106,30 +76,21 @@ function CourseChapters({ loading, courseDetail }: Props) {
                                 <h2 className='max-sm:text-lg text-2xl lg:text-3xl'>{exercise.name}</h2>
                               </div>
 
-                              {/* {
-                                EnableExercise(index, indexExc, chapter?.exercises.length)
-                                  ? } */}
-
-
-                              {/* <Link href={'/courses/' + courseDetail.courseId + '/' + chapter.chapterId + '/' + exercise.slug}>
-                                <Button variant={'pixel'}>{exercise.xp} xp</Button>
-                              </Link> */}
-
                               {
-                                isExerciseCompleted(chapter.chapterId, indexExc + 1)
+                                isExerciseCompleted(exercise.id)
                                   ?
-                                  <Link href={'/courses/' + courseDetail.courseId + '/' + chapter.chapterId + '/' + exercise.slug}>
+                                  <Link href={'/courses/' + courseDetail.id + '/' + chapter.id + '/' + exercise.slug}>
                                     <Button variant={'pixel'} className='bg-green-600'>Completed</Button>
                                   </Link>
                                   :
                                   (courseDetail?.userEnrolled && (!hasPremiumAccess) && index < 2)
                                     ?
-                                    <Link href={'/courses/' + courseDetail.courseId + '/' + chapter.chapterId + '/' + exercise.slug}>
+                                    <Link href={'/courses/' + courseDetail.id + '/' + chapter.id + '/' + exercise.slug}>
                                       <Button variant={'pixel'}>{exercise.xp} xp</Button>
                                     </Link>
                                     :
                                     (!hasPremiumAccess && courseDetail?.userEnrolled && index >= 2) ?
-                                      <Link href={`/pricing?redirect=/courses/${courseDetail.courseId}`}>
+                                      <Link href={`/pricing?redirect=/courses/${courseDetail.id}`}>
                                         <Button
                                           className='cursor-pointer '
                                           variant={'link'}
@@ -137,7 +98,7 @@ function CourseChapters({ loading, courseDetail }: Props) {
                                       </Link>
                                       :
                                       (hasPremiumAccess && courseDetail.userEnrolled) ?
-                                        <Link href={'/courses/' + courseDetail.courseId + '/' + chapter.chapterId + '/' + exercise.slug}>
+                                        <Link href={'/courses/' + courseDetail.id + '/' + chapter.id + '/' + exercise.slug}>
                                           <Button variant={'pixel'}>{exercise.xp} xp</Button>
                                         </Link>
                                         :
