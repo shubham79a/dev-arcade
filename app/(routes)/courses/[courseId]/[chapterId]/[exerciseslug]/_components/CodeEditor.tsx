@@ -37,7 +37,7 @@ const CodeEditorChildren = ({ onCompleteExercise, IsCompleted }: any) => {
                 onClick={() => onCompleteExercise()}
                 disabled={IsCompleted}
             >
-                {IsCompleted ? 'Already Completd' : "Mark Completed"}
+                {IsCompleted ? 'Already Completed' : "Mark Completed"}
             </Button>
         </div>
     )
@@ -51,7 +51,7 @@ const NonWebEditorChildren = ({ onCompleteExercise, IsCompleted }: any) => {
                 onClick={() => onCompleteExercise()}
                 disabled={IsCompleted}
             >
-                {IsCompleted ? 'Already Completd' : "Mark Completed"}
+                {IsCompleted ? 'Already Completed' : "Mark Completed"}
             </Button>
         </div>
     )
