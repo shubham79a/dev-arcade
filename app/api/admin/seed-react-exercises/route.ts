@@ -8,8 +8,8 @@ import { getCourseIdParam, requireAdmin } from "@/lib/admin";
 const DEFAULT_COURSE_ID = 1;
 
 export async function GET(req: NextRequest) {
-    // const denied = await requireAdmin();
-    // if (denied) return denied;
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
     const COURSE_ID = getCourseIdParam(req, DEFAULT_COURSE_ID);
 

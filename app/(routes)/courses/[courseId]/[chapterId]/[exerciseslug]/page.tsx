@@ -111,14 +111,14 @@ function Playground() {
         <div className='h-[calc(100vh-80px)] border-t-4'>
             <Group orientation="horizontal">
                 <Panel defaultSize={40} minSize={20}>
-                    <div className='h-full overflow-hidden'>
+                    <div className=''>
                         <ContentSection courseExerciseData={courseExerciseData} loading={loading}
                             hintRevealed={hintRevealed} onRevealHint={() => setHintRevealed(true)} />
                     </div>
                 </Panel>
                 <Separator className='w-1.5 bg-zinc-700 hover:bg-blue-500 transition-colors' />
                 <Panel defaultSize={60} minSize={30}>
-                    <div className='h-full overflow-hidden'>
+                    <div className=''>
                         <CodeEditor courseExerciseData={courseExerciseData} loading={loading}
                             usedHint={hintRevealed} onCompleted={onExerciseCompleted} />
                     </div>

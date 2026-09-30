@@ -1,13 +1,13 @@
 import { db } from "@/config/db";
 import { CourseTable, CourseChaptersTable } from "@/config/schema";
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { requireAdmin } from "@/lib/admin";
 
 const COURSE = {
     title: "JavaScript Beginner",
     desc: "Learn JavaScript from scratch — variables, functions, DOM manipulation, arrays, objects, and modern ES6+ features through interactive browser-based exercises.",
-    bannerImage: "https://ik.imagekit.io/shubham79/js-banner.png",
+    bannerImage: "https://th.bing.com/th/id/OIP.PexdlozZK0aGx048CaYCQwHaER?w=353&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
     level: "Beginner",
     tags: "JavaScript,Web Development,Frontend",
     editorType: "static"
@@ -81,35 +81,45 @@ export async function GET(req: NextRequest) {
     if (denied) return denied;
 
     try {
-        // Re-running should not create a second copy of the course
-        const existing = await db.select({ id: CourseTable.id }).from(CourseTable).where(eq(CourseTable.title, COURSE.title));
-        if (existing.length > 0) {
-            return NextResponse.json({
-                message: "JavaScript course already exists — skipped",
-                courseId: existing[0].id,
-            });
+        // 1. Get or Insert the JavaScript course
+        let courseId;
+        const existingCourse = await db.select({ id: CourseTable.id }).from(CourseTable).where(eq(CourseTable.title, COURSE.title));
+        
+        if (existingCourse.length > 0) {
+            courseId = existingCourse[0].id;
+        } else {
+            const courseResult = await db.insert(CourseTable).values({
+                title: COURSE.title,
+                desc: COURSE.desc,
+                bannerImage: COURSE.bannerImage,
+                level: COURSE.level,
+                tags: COURSE.tags,
+                editorType: COURSE.editorType,
+            }).returning();
+            courseId = courseResult[0].id;
         }
 
-        // 1. Insert the JavaScript course
-        const courseResult = await db.insert(CourseTable).values({
-            title: COURSE.title,
-            desc: COURSE.desc,
-            bannerImage: COURSE.bannerImage,
-            level: COURSE.level,
-            tags: COURSE.tags,
-            editorType: COURSE.editorType,
-        }).returning();
-
-        const courseId = courseResult[0].id;
-
-        // 2. Insert chapters for this course
+        // 2. Insert or Update chapters for this course
         for (const chapter of CHAPTERS) {
-            await db.insert(CourseChaptersTable).values({
-                courseId: courseId,
-                orderIndex: chapter.id,
-                name: chapter.name,
-                desc: chapter.desc,
-            });
+            const existingChapter = await db.select({ id: CourseChaptersTable.id })
+                .from(CourseChaptersTable)
+                .where(and(
+                    eq(CourseChaptersTable.courseId, courseId),
+                    eq(CourseChaptersTable.orderIndex, chapter.id)
+                ));
+
+            if (existingChapter.length > 0) {
+                await db.update(CourseChaptersTable)
+                    .set({ name: chapter.name, desc: chapter.desc })
+                    .where(eq(CourseChaptersTable.id, existingChapter[0].id));
+            } else {
+                await db.insert(CourseChaptersTable).values({
+                    courseId: courseId,
+                    orderIndex: chapter.id,
+                    name: chapter.name,
+                    desc: chapter.desc,
+                });
+            }
         }
 
         return NextResponse.json({
