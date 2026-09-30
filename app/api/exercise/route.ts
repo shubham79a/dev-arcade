@@ -3,6 +3,7 @@ import { CompletedExerciseTable, CourseChaptersTable, CourseTable, EnrolledCours
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { and, asc, eq } from "drizzle-orm";
+import { canAccessChapter } from "@/lib/premium";
 
 export async function POST(req: NextRequest) {
 
@@ -24,12 +25,20 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Please enroll in the course first", enrolled: false }, { status: 403 });
     }
 
+    if (!(await canAccessChapter(courseIdNum, chapterIdNum))) {
+        return NextResponse.json({ error: "Upgrade to Pro to unlock this chapter", premium: true }, { status: 402 });
+    }
+
     const courseInfo = await db.select().from(CourseTable).where(eq(CourseTable.id, courseIdNum))
 
     const courseResult = await db.select().from(CourseChaptersTable).where(and(eq(CourseChaptersTable.courseId, courseIdNum), eq(CourseChaptersTable.id, chapterIdNum)));
 
     // Query exercise by slug
-    const exerciseResult = await db.select().from(ExerciseTable).where(and(eq(ExerciseTable.courseId, courseIdNum), eq(ExerciseTable.slug, exerciseId)));
+    const exerciseResult = await db.select().from(ExerciseTable).where(and(eq(ExerciseTable.courseId, courseIdNum), eq(ExerciseTable.chapterId, chapterIdNum), eq(ExerciseTable.slug, exerciseId)));
+
+    if (courseInfo.length === 0 || courseResult.length === 0 || exerciseResult.length === 0) {
+        return NextResponse.json({ error: "Exercise not found" }, { status: 404 });
+    }
 
     const completedExercise = await db.select().from(CompletedExerciseTable).where(and(eq(CompletedExerciseTable.courseId, courseIdNum), eq(CompletedExerciseTable.chapterId, chapterIdNum), eq(CompletedExerciseTable.userId, email)));
 

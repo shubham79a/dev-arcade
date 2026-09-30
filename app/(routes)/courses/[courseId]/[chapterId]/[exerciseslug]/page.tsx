@@ -47,17 +47,12 @@ function Playground() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [courseExerciseData, setCourseExerciseData] = useState<CourseExercise>();
-
-
-
-    // console.log(
-    //     courseId, chapterId, exerciseslug
-    // )
-
+    const [hintRevealed, setHintRevealed] = useState(false);
 
     useEffect(() => {
+        setHintRevealed(false);
         GetExerciseCourseDetail();
-    }, [])
+    }, [courseId, chapterId, exerciseslug])
 
     const GetExerciseCourseDetail = async () => {
         setLoading(true);
@@ -67,18 +62,43 @@ function Playground() {
                 chapterId: chapterId,
                 exerciseId: exerciseslug
             })
-            setLoading(false);
-
-            console.log(result.data);
             setCourseExerciseData(result.data);
         } catch (error: any) {
-            setLoading(false);
             if (error?.response?.status === 403) {
                 toast.error('Please enroll in the course first!');
                 router.push('/courses/' + courseId);
+            } else if (error?.response?.status === 404) {
+                toast.error('Exercise not found');
+                router.push('/courses/' + courseId);
+            } else {
+                toast.error('Could not load the exercise');
             }
+        } finally {
+            setLoading(false);
         }
     }
+
+    const onExerciseCompleted = (records: CompletedExercises[]) => {
+        setCourseExerciseData(prev => prev && ({
+            ...prev,
+            completedExercise: [...(prev.completedExercise ?? []), ...records]
+        }));
+    }
+
+    // Previous / Next within the current chapter (API returns exercises sorted by orderIndex)
+    const exercises = courseExerciseData?.exercises ?? [];
+    const currentIndex = exercises.findIndex(item => item.slug === exerciseslug);
+    const prevExercise = currentIndex > 0 ? exercises[currentIndex - 1] : undefined;
+    const nextExercise = currentIndex >= 0 ? exercises[currentIndex + 1] : undefined;
+
+    const goToExercise = (slug: string) => {
+        router.push(`/courses/${courseId}/${chapterId}/${slug}`);
+    }
+
+    const exerciseData = courseExerciseData?.exerciseData;
+    const earnableXp = hintRevealed
+        ? Math.max(0, (exerciseData?.xp ?? 0) - (exerciseData?.hintXpPenalty ?? 0))
+        : exerciseData?.xp;
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -92,24 +112,32 @@ function Playground() {
             <Group orientation="horizontal">
                 <Panel defaultSize={40} minSize={20}>
                     <div className=''>
-                        <ContentSection courseExerciseData={courseExerciseData} loading={loading} />
+                        <ContentSection courseExerciseData={courseExerciseData} loading={loading}
+                            hintRevealed={hintRevealed} onRevealHint={() => setHintRevealed(true)} />
                     </div>
                 </Panel>
                 <Separator className='w-1.5 bg-zinc-700 hover:bg-blue-500 transition-colors' />
                 <Panel defaultSize={60} minSize={30}>
                     <div className=''>
-                        <CodeEditor courseExerciseData={courseExerciseData} loading={loading} />
+                        <CodeEditor courseExerciseData={courseExerciseData} loading={loading}
+                            usedHint={hintRevealed} onCompleted={onExerciseCompleted} />
                     </div>
                 </Panel>
             </Group>
 
             <div className='font-game fixed bottom-0 w-full bg-zinc-900 flex p-4 justify-between items-center'>
-                <Button variant={'pixel'} className='text-xl'>Prvious</Button>
+                <Button variant={'pixel'} className='text-xl'
+                    disabled={!prevExercise}
+                    onClick={() => prevExercise && goToExercise(prevExercise.slug)}
+                >Previous</Button>
                 <div className='flex gap-3 items-center'>
                     <Image src='/star.png' alt='xp-star' width={40} height={40} />
-                    <h2 className='text-2xl '>You can earn <span className='text-green-400 text-4xl'>{courseExerciseData?.exerciseData?.xp}</span> Xp</h2>
+                    <h2 className='text-2xl '>You can earn <span className='text-green-400 text-4xl'>{earnableXp}</span> Xp</h2>
                 </div>
-                <Button variant={'pixel'} className='text-xl'>Next</Button>
+                <Button variant={'pixel'} className='text-xl'
+                    disabled={!nextExercise}
+                    onClick={() => nextExercise && goToExercise(nextExercise.slug)}
+                >Next</Button>
             </div>
 
         </div>

@@ -1,6 +1,8 @@
 import { db } from "@/config/db";
 import { CourseTable, CourseChaptersTable } from "@/config/schema";
 import { NextRequest, NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/admin";
 
 // Python course data
 const COURSE = {
@@ -41,7 +43,19 @@ const CHAPTERS = [
 ];
 
 export async function GET(req: NextRequest) {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     try {
+        // Re-running should not create a second copy of the course
+        const existing = await db.select({ id: CourseTable.id }).from(CourseTable).where(eq(CourseTable.title, COURSE.title));
+        if (existing.length > 0) {
+            return NextResponse.json({
+                message: "Python course already exists — skipped",
+                courseId: existing[0].id,
+            });
+        }
+
         // 1. Insert the Python course
         const courseResult = await db.insert(CourseTable).values({
             title: COURSE.title,

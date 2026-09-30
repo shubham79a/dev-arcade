@@ -1,4 +1,4 @@
-import { boolean, integer, json, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, json, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -50,7 +50,9 @@ export const EnrolledCourseTable = pgTable('enrollCourse', {
     userId: varchar().notNull(),
     enrolledDate: timestamp().defaultNow(),
     xpEarned: integer().default(0)
-})
+}, (t) => [
+    uniqueIndex('enroll_user_course_idx').on(t.userId, t.courseId),
+])
 
 export const CompletedExerciseTable = pgTable('completeExercise', {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -61,4 +63,6 @@ export const CompletedExerciseTable = pgTable('completeExercise', {
     completedDate: timestamp().defaultNow(),
     usedHint: boolean().default(false),
     xpAwarded: integer().default(0),
-})
+}, (t) => [
+    uniqueIndex('complete_user_exercise_idx').on(t.userId, t.exerciseId),
+])

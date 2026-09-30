@@ -1,5 +1,6 @@
 import { db } from "@/config/db";
 import { ExerciseTable } from "@/config/schema";
+import { requireAdmin } from "@/lib/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 const DATA =
@@ -117,7 +118,10 @@ const DATA =
 
 
 export async function GET(req: NextRequest) {
-    DATA.forEach(async (item) => {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
+    for (const item of DATA) {
         await db.insert(ExerciseTable).values({
             courseId: item?.courseId,
             slug: item?.slug,
@@ -133,7 +137,7 @@ export async function GET(req: NextRequest) {
             validationRegex: item?.validationRegex,
             expectedOutput: item?.expectedOutput,
             hintXpPenalty: item?.hintXpPenalty,
-        })
-    })
+        }).onConflictDoNothing()
+    }
     return NextResponse.json("Success");
 }

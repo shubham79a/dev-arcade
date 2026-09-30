@@ -24,10 +24,14 @@ function EnrolledCourses() {
 
     const GetUserEnrolledCourses = async () => {
         setLoading(true);
-        const result = await axios.get('/api/course?courseid=enrolled');
-        console.log(result.data);
-        setEnrolledCourses(result.data);
-        setLoading(false);
+        try {
+            const result = await axios.get('/api/course?courseid=enrolled');
+            setEnrolledCourses(result.data);
+        } catch (error) {
+            setEnrolledCourses([]);
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -43,7 +47,7 @@ function EnrolledCourses() {
                 loading && <Skeleton className='w-full rounded-2xl my-5' />
             }
             {
-                enrolledCourses?.length == 0 ?
+                loading ? null : enrolledCourses?.length == 0 ?
                     <div className='flex flex-col items-center gap-3 p-7 border rounded-2xl bg-zinc-900 '>
                         <Image src={'/book.png'} alt='book'
                             width={90} height={90} />

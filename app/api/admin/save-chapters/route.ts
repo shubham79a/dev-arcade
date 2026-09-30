@@ -1,5 +1,6 @@
 import { db } from "@/config/db";
 import { CourseChaptersTable } from "@/config/schema";
+import { getCourseIdParam, requireAdmin } from "@/lib/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -69,13 +70,19 @@ const DATA = [
 
 
 export async function GET(req: NextRequest) {
-    DATA.forEach(async (item) => {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
+    // Pass ?courseId= to seed a different course
+    const courseId = getCourseIdParam(req, 2);
+
+    for (const item of DATA) {
         await db.insert(CourseChaptersTable).values({
-            courseId: 2, //Change Course ID depends on course info,
+            courseId: courseId,
             orderIndex: item?.id,
             name: item?.name,
             desc: item?.desc,
         })
-    })
+    }
     return NextResponse.json('Success')
 }

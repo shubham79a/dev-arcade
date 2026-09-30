@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     SandpackProvider,
     SandpackLayout,
     SandpackCodeEditor,
     SandpackPreview,
     useSandpack,
+    SandpackFiles,
 } from "@codesandbox/sandpack-react";
 import { Panel, Group, Separator } from 'react-resizable-panels';
 import { CourseExercise } from '../page';
+import { CompletedExercises } from '../../../../_components/CourseList';
 import { Button } from '@/components/ui/button';
 import { nightOwl } from "@codesandbox/sandpack-themes"
 import { useParams } from 'next/navigation';
@@ -19,9 +21,30 @@ import ConsoleOutput from './ConsoleOutput';
 type Props = {
     courseExerciseData?: CourseExercise | undefined
     loading: boolean
+    usedHint: boolean
+    onCompleted: (records: CompletedExercises[]) => void
 }
 
-const CodeEditorChildren = ({ onCompleteExercise, IsCompleted }: any) => {
+type CompleteButtonProps = {
+    onCompleteExercise: (files: SandpackFiles) => void
+    IsCompleted: boolean
+    submitting: boolean
+}
+
+const CompleteButton = ({ onCompleteExercise, IsCompleted, submitting }: CompleteButtonProps) => {
+    const { sandpack } = useSandpack();
+
+    return (
+        <Button variant={'pixel'} className='bg-[#a3e534] text-xl' size={'lg'}
+            onClick={() => onCompleteExercise(sandpack.files)}
+            disabled={IsCompleted || submitting}
+        >
+            {IsCompleted ? 'Already Completed' : submitting ? 'Checking...' : "Mark Completed"}
+        </Button>
+    )
+}
+
+const CodeEditorChildren = (props: CompleteButtonProps) => {
 
     const { sandpack } = useSandpack();
 
@@ -33,34 +56,25 @@ const CodeEditorChildren = ({ onCompleteExercise, IsCompleted }: any) => {
             >
                 Run Code
             </Button>
-            <Button variant={'pixel'} className='bg-[#a3e534] text-xl' size={'lg'}
-                onClick={() => onCompleteExercise()}
-                disabled={IsCompleted}
-            >
-                {IsCompleted ? 'Already Completed' : "Mark Completed"}
-            </Button>
+            <CompleteButton {...props} />
         </div>
     )
 }
 
 /** Buttons for non-web editor — no "Run Code" here since ConsoleOutput has its own run button */
-const NonWebEditorChildren = ({ onCompleteExercise, IsCompleted }: any) => {
+const NonWebEditorChildren = (props: CompleteButtonProps) => {
     return (
         <div className='flex font-game gap-5 absolute bottom-40 right-5'>
-            <Button variant={'pixel'} className='bg-[#a3e534] text-xl' size={'lg'}
-                onClick={() => onCompleteExercise()}
-                disabled={IsCompleted}
-            >
-                {IsCompleted ? 'Already Completed' : "Mark Completed"}
-            </Button>
+            <CompleteButton {...props} />
         </div>
     )
 }
 
 
-function CodeEditor({ courseExerciseData, loading }: Props) {
+function CodeEditor({ courseExerciseData, loading, usedHint, onCompleted }: Props) {
 
     const { exerciseslug } = useParams();
+    const [submitting, setSubmitting] = useState(false);
 
     const editorType = courseExerciseData?.editorType;
     const isWeb = isWebEditorType(editorType);
@@ -69,9 +83,9 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
     // Use actual exercise.id from the database instead of fragile index math
     const currentExercise = courseExerciseData?.exercises?.find(item => item.slug === exerciseslug);
 
-    const IsCompleted = courseExerciseData?.completedExercise?.find((item) => item.exerciseId === currentExercise?.id);
+    const IsCompleted = !!courseExerciseData?.completedExercise?.find((item) => item.exerciseId === currentExercise?.id);
 
-    const onCompleteExercise = async () => {
+    const onCompleteExercise = async (sandpackFiles: SandpackFiles) => {
         if (IsCompleted) {
             toast.error('Exercise already completed');
             return;
@@ -79,25 +93,40 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
 
         if (!currentExercise) return;
 
+        // Send plain { path: code } so the server can validate the submission
+        const files: Record<string, string> = {};
+        for (const [path, file] of Object.entries(sandpackFiles)) {
+            files[path] = typeof file === 'string' ? file : file.code;
+        }
+
+        setSubmitting(true);
         try {
             const result = await axios.post('/api/exercise/complete', {
-                courseId: courseExerciseData?.courseId,
-                chapterId: courseExerciseData?.id,
                 exerciseId: currentExercise?.id,
-                usedHint: false, // TODO: track if user revealed hint
+                usedHint,
+                files,
             })
 
-            console.log(result);
+            onCompleted(result.data);
             toast.success('Exercise completed successfully');
         } catch (error: any) {
             if (error?.response?.status === 403) {
                 toast.error('Please enroll in the course first!');
             } else if (error?.response?.status === 409) {
                 toast.error('Exercise already completed!');
+            } else if (error?.response?.data?.error) {
+                toast.error(error.response.data.error);
             } else {
                 toast.error('Something went wrong');
             }
+        } finally {
+            setSubmitting(false);
         }
+    }
+
+    // Wait for data so Sandpack mounts once with the right starter files
+    if (!courseExerciseData) {
+        return null;
     }
 
     // ─── Web Editor Mode (HTML/CSS/JS — current Sandpack setup) ───
@@ -105,6 +134,7 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
         return (
             <div>
                 <SandpackProvider
+                    key={courseExerciseData?.exerciseData?.id}
                     //@ts-ignore
                     template={courseExerciseData?.editorType ?? 'react'}
                     style={{
@@ -135,7 +165,7 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
                                             height: '100%'
                                         }}
                                     />
-                                    <CodeEditorChildren onCompleteExercise={onCompleteExercise} IsCompleted={IsCompleted} />
+                                    <CodeEditorChildren onCompleteExercise={onCompleteExercise} IsCompleted={IsCompleted} submitting={submitting} />
                                 </div>
                             </Panel>
                             <Separator className='w-1.5 bg-zinc-700 hover:bg-blue-500 transition-colors' />
@@ -159,9 +189,17 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
     }
 
     // ─── Non-Web Editor Mode (Python/C++/Java — CodeMirror + Judge0) ───
+    if (!langConfig) {
+        return (
+            <div className='p-10 font-game text-xl text-red-400'>
+                Unsupported editor type: {editorType}
+            </div>
+        )
+    }
+
     const starterFiles = courseExerciseData?.exerciseData?.starterCode || {
-        [langConfig!.defaultFilename]: {
-            code: langConfig!.defaultCode,
+        [langConfig.defaultFilename]: {
+            code: langConfig.defaultCode,
             active: true,
         },
     }
@@ -169,6 +207,7 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
     return (
         <div>
             <SandpackProvider
+                key={courseExerciseData?.exerciseData?.id}
                 template="static"
                 style={{
                     height: '100vh'
@@ -195,18 +234,18 @@ function CodeEditor({ courseExerciseData, loading }: Props) {
                                     }}
                                     additionalLanguages={[
                                         {
-                                            name: langConfig!.name,
-                                            extensions: langConfig!.extensions,
-                                            language: langConfig!.codemirrorLang(),
+                                            name: langConfig.name,
+                                            extensions: langConfig.extensions,
+                                            language: langConfig.codemirrorLang(),
                                         },
                                     ]}
                                 />
-                                <NonWebEditorChildren onCompleteExercise={onCompleteExercise} IsCompleted={IsCompleted} />
+                                <NonWebEditorChildren onCompleteExercise={onCompleteExercise} IsCompleted={IsCompleted} submitting={submitting} />
                             </div>
                         </Panel>
                         <Separator className='w-1.5 bg-zinc-700 hover:bg-blue-500 transition-colors' />
                         <Panel defaultSize={50} minSize={20}>
-                            <ConsoleOutput languageId={langConfig!.judge0Id} />
+                            <ConsoleOutput languageId={langConfig.judge0Id} />
                         </Panel>
                     </Group>
                 </SandpackLayout>

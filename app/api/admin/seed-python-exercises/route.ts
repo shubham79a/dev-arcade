@@ -2,10 +2,17 @@ import { db } from "@/config/db";
 import { ExerciseTable, CourseChaptersTable } from "@/config/schema";
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
+import { getCourseIdParam, requireAdmin } from "@/lib/admin";
 
-const COURSE_ID = 5; // The Python course ID you got from Step 1
+// Override with ?courseId=<id returned by /api/admin/seed-python-course>
+const DEFAULT_COURSE_ID = 5;
 
 export async function GET(req: NextRequest) {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
+    const COURSE_ID = getCourseIdParam(req, DEFAULT_COURSE_ID);
+
     try {
         // 1. Fetch the chapters for this course dynamically
         const chapters = await db

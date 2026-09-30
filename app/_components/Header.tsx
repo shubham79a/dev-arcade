@@ -98,10 +98,9 @@ function Header() {
     const GetCourses = async () => {
         try {
             const result = await axios.get('/api/course');
-            console.log("api result", result.data.result);
             setAllCourses(result.data.result ?? []);
         } catch (error: any) {
-            console.log(error.response.data);
+            console.error('Failed to load courses', error?.response?.data ?? error);
         }
     }
 

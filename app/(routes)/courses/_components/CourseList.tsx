@@ -67,10 +67,12 @@ function CourseList({ smallerCard = false, maxLimit = 999 }: Props) {
 
     const GetAllCourses = async () => {
         setLoading(true);
-        const result = await axios.get('/api/course');
-        console.log("All Courses: ", result.data);
-        setCourseList(result.data.result);
-        setLoading(false);
+        try {
+            const result = await axios.get('/api/course');
+            setCourseList(result.data.result);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (

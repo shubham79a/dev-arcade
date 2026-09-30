@@ -11,28 +11,23 @@ import UpgradeToPro from '@/app/(routes)/dashboard/_components/UpgradeToPro';
 import CommunityHelp from './_components/CommunityHelp';
 
 
-type CourseDetail = {
-}
-
 function CourseDetail() {
     const { courseId } = useParams();
     const [courseDetail, setCourseDetail] = useState<Course>();
     const [loading, setLoading] = useState(false);
 
-    console.log("course detail", courseDetail)
-
     useEffect(() => {
-        console.log("course detail", courseDetail)
-
         courseId && GetCourseDetail();
     }, [courseId])
 
     const GetCourseDetail = async () => {
         setLoading(true);
-        const result = await axios.get('/api/course?courseid=' + courseId);
-        setCourseDetail(result?.data);
-        console.log(result);
-        setLoading(false);
+        try {
+            const result = await axios.get('/api/course?courseid=' + courseId);
+            setCourseDetail(result?.data);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
