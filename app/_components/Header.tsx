@@ -142,10 +142,10 @@ function Header() {
 
                                 <div className='border-t border-zinc-800 my-3' />
 
-                                <Link href='/' onClick={() => setMobileOpen(false)}
+                                {/* <Link href='/' onClick={() => setMobileOpen(false)}
                                     className='p-3 hover:bg-zinc-800 rounded-xl font-game text-lg'>
                                     Contest
-                                </Link>
+                                </Link> */}
                                 {/* <Link href='/' onClick={() => setMobileOpen(false)}
                                     className='p-3 hover:bg-zinc-800 rounded-xl font-game text-lg'>
                                     Projects
@@ -193,11 +193,11 @@ function Header() {
                                     </ul>
                                 </NavigationMenuContent>
                             </NavigationMenuItem>
-                            <NavigationMenuItem>
+                            {/* <NavigationMenuItem>
                                 <NavigationMenuLink asChild>
                                     <Link href="/">Contest</Link>
                                 </NavigationMenuLink>
-                            </NavigationMenuItem>
+                            </NavigationMenuItem> */}
                             {/* <NavigationMenuItem>
                                 <NavigationMenuLink asChild>
                                     <Link href="/">Projects</Link>
@@ -231,7 +231,7 @@ function Header() {
                     </Link>
                     : <div className='flex gap-4 items-center'>
                         <Link href={'/dashboard'}>
-                            <Button className='font-game text-2xl' variant={'pixel'}>Dashboard</Button>
+                            <Button className='font-game text-2xl cursor-pointer' variant={'pixel'}>Dashboard</Button>
                         </Link>
                         <UserButton />
                     </div>

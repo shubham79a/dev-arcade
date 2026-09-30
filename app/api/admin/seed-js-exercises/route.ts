@@ -605,14 +605,27 @@ export async function GET(req: NextRequest) {
 
         for (const item of DATA) {
             try {
-                await db.insert(ExerciseTable).values(item);
+                await db.insert(ExerciseTable).values(item).onConflictDoUpdate({
+                    target: ExerciseTable.slug,
+                    set: {
+                        courseId: item.courseId,
+                        chapterId: item.chapterId,
+                        name: item.name,
+                        xp: item.xp,
+                        difficulty: item.difficulty,
+                        orderIndex: item.orderIndex,
+                        content: item.content,
+                        task: item.task,
+                        hint: item.hint,
+                        starterCode: item.starterCode,
+                        validationRegex: item.validationRegex,
+                        expectedOutput: item.expectedOutput,
+                        hintXpPenalty: item.hintXpPenalty,
+                    }
+                });
                 successCount++;
             } catch (err: any) {
-                if (err.code === '23505') {
-                    console.log(`Skipped duplicate slug: ${item.slug}`);
-                } else {
-                    errors.push(`Failed on ${item.slug}: ${err.message}`);
-                }
+                errors.push(`Failed on ${item.slug}: ${err.message}`);
             }
         }
 

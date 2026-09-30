@@ -132,13 +132,13 @@ function CodeEditor({ courseExerciseData, loading, usedHint, onCompleted }: Prop
     // ─── Web Editor Mode (HTML/CSS/JS — current Sandpack setup) ───
     if (isWeb) {
         return (
-            <div>
+            <div className="h-full">
                 <SandpackProvider
                     key={courseExerciseData?.exerciseData?.id}
                     //@ts-ignore
                     template={courseExerciseData?.editorType ?? 'react'}
                     style={{
-                        height: '100vh'
+                        height: '100%'
                     }}
                     files={
                         courseExerciseData?.exerciseData?.starterCode
@@ -205,12 +205,12 @@ function CodeEditor({ courseExerciseData, loading, usedHint, onCompleted }: Prop
     }
 
     return (
-        <div>
+        <div className="h-full">
             <SandpackProvider
                 key={courseExerciseData?.exerciseData?.id}
                 template="static"
                 style={{
-                    height: '100vh'
+                    height: '100%'
                 }}
                 files={starterFiles}
                 options={{

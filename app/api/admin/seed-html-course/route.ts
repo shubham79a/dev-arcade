@@ -1,10 +1,19 @@
 import { db } from "@/config/db";
-import { CourseChaptersTable } from "@/config/schema";
-import { getCourseIdParam, requireAdmin } from "@/lib/admin";
+import { CourseTable, CourseChaptersTable } from "@/config/schema";
 import { NextRequest, NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/admin";
 
+const COURSE = {
+    title: "HTML Beginner",
+    desc: "Discover the foundation of every webpage and learn how HTML shapes the digital world.",
+    bannerImage: "https://ik.imagekit.io/shubham79/html-banner.png",
+    level: "Beginner",
+    tags: "HTML,Web Development,Frontend",
+    editorType: "static"
+};
 
-const DATA = [
+const CHAPTERS = [
     {
         "id": 1,
         "name": "Introduction to HTML",
@@ -65,24 +74,51 @@ const DATA = [
         "name": "HTML Best Practices",
         "desc": "Write clear, clean, and accessible HTML optimized for real-world use.",
     }
-]
-
-
+];
 
 export async function GET(req: NextRequest) {
     const denied = await requireAdmin();
     if (denied) return denied;
 
-    // Pass ?courseId= to seed a different course
-    const courseId = getCourseIdParam(req, 2);
+    try {
+        // Re-running should not create a second copy of the course
+        const existing = await db.select({ id: CourseTable.id }).from(CourseTable).where(eq(CourseTable.title, COURSE.title));
+        if (existing.length > 0) {
+            return NextResponse.json({
+                message: "HTML course already exists — skipped",
+                courseId: existing[0].id,
+            });
+        }
 
-    for (const item of DATA) {
-        await db.insert(CourseChaptersTable).values({
+        // 1. Insert the HTML course
+        const courseResult = await db.insert(CourseTable).values({
+            title: COURSE.title,
+            desc: COURSE.desc,
+            bannerImage: COURSE.bannerImage,
+            level: COURSE.level,
+            tags: COURSE.tags,
+            editorType: COURSE.editorType,
+        }).returning();
+
+        const courseId = courseResult[0].id;
+
+        // 2. Insert chapters for this course
+        for (const chapter of CHAPTERS) {
+            await db.insert(CourseChaptersTable).values({
+                courseId: courseId,
+                orderIndex: chapter.id,
+                name: chapter.name,
+                desc: chapter.desc,
+            });
+        }
+
+        return NextResponse.json({
+            message: "HTML course and chapters seeded successfully",
             courseId: courseId,
-            orderIndex: item?.id,
-            name: item?.name,
-            desc: item?.desc,
-        })
+            chaptersCount: CHAPTERS.length
+        });
+    } catch (error: any) {
+        console.error("Seed error:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    return NextResponse.json('Success')
 }

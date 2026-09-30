@@ -1,10 +1,17 @@
 import { db } from "@/config/db";
-import { CourseChaptersTable } from "@/config/schema";
+import { CourseTable, CourseChaptersTable } from "@/config/schema";
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
-import { getCourseIdParam, requireAdmin } from "@/lib/admin";
+import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/admin";
 
-const DEFAULT_CSS_COURSE_ID = 3; // override with ?courseId=
+const COURSE = {
+    title: "CSS Beginner",
+    desc: "Master styling web pages from scratch. Learn about colors, typography, box model, flexbox, grid, responsive design, and animations.",
+    bannerImage: "https://ik.imagekit.io/shubham79/css-banner.png",
+    level: "Beginner",
+    tags: "CSS,Web Development,Frontend",
+    editorType: "static"
+};
 
 const CHAPTERS = [
     { id: 1, name: "Introduction to CSS", desc: "Learn how CSS works — inline, internal, and external stylesheets. Your first taste of styling." },
@@ -25,17 +32,32 @@ export async function GET(req: NextRequest) {
     const denied = await requireAdmin();
     if (denied) return denied;
 
-    const CSS_COURSE_ID = getCourseIdParam(req, DEFAULT_CSS_COURSE_ID);
-
     try {
-        for (const chapter of CHAPTERS) {
-            // Skip chapters that already exist so re-running doesn't create duplicates
-            const existing = await db.select({ id: CourseChaptersTable.id }).from(CourseChaptersTable)
-                .where(and(eq(CourseChaptersTable.courseId, CSS_COURSE_ID), eq(CourseChaptersTable.orderIndex, chapter.id)));
-            if (existing.length > 0) continue;
+        // Re-running should not create a second copy of the course
+        const existing = await db.select({ id: CourseTable.id }).from(CourseTable).where(eq(CourseTable.title, COURSE.title));
+        if (existing.length > 0) {
+            return NextResponse.json({
+                message: "CSS course already exists — skipped",
+                courseId: existing[0].id,
+            });
+        }
 
+        // 1. Insert the CSS course
+        const courseResult = await db.insert(CourseTable).values({
+            title: COURSE.title,
+            desc: COURSE.desc,
+            bannerImage: COURSE.bannerImage,
+            level: COURSE.level,
+            tags: COURSE.tags,
+            editorType: COURSE.editorType,
+        }).returning();
+
+        const courseId = courseResult[0].id;
+
+        // 2. Insert chapters for this course
+        for (const chapter of CHAPTERS) {
             await db.insert(CourseChaptersTable).values({
-                courseId: CSS_COURSE_ID,
+                courseId: courseId,
                 orderIndex: chapter.id,
                 name: chapter.name,
                 desc: chapter.desc,
@@ -43,8 +65,8 @@ export async function GET(req: NextRequest) {
         }
 
         return NextResponse.json({
-            message: "CSS chapters seeded successfully",
-            courseId: CSS_COURSE_ID,
+            message: "CSS course and chapters seeded successfully",
+            courseId: courseId,
             chaptersCount: CHAPTERS.length
         });
     } catch (error: any) {

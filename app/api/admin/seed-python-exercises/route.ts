@@ -281,15 +281,27 @@ export async function GET(req: NextRequest) {
         // Insert sequentially to avoid overlapping errors
         for (const item of DATA) {
             try {
-                await db.insert(ExerciseTable).values(item);
+                await db.insert(ExerciseTable).values(item).onConflictDoUpdate({
+                    target: ExerciseTable.slug,
+                    set: {
+                        courseId: item.courseId,
+                        chapterId: item.chapterId,
+                        name: item.name,
+                        xp: item.xp,
+                        difficulty: item.difficulty,
+                        orderIndex: item.orderIndex,
+                        content: item.content,
+                        task: item.task,
+                        hint: item.hint,
+                        starterCode: item.starterCode,
+                        validationRegex: item.validationRegex,
+                        expectedOutput: item.expectedOutput,
+                        hintXpPenalty: item.hintXpPenalty,
+                    }
+                });
                 successCount++;
             } catch (err: any) {
-                // Ignore unique constraint error if it's already there
-                if (err.code === '23505') {
-                    console.log(`Skipped duplicate slug: ${item.slug}`);
-                } else {
-                    errors.push(`Failed on ${item.slug}: ${err.message}`);
-                }
+                errors.push(`Failed on ${item.slug}: ${err.message}`);
             }
         }
 
